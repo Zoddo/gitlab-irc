@@ -1,0 +1,21 @@
+{
+  "name": "zoddo/gitlab-irc",
+  "description": "A webhook IRC for GitLab",
+  "keywords": ["PHP", "GitLab", "webhook", "IRC"],
+  "homepage": "https://github.com/Zoddo/gitlab-irc",
+  "license": "GPLv2",
+  "authors": [
+    {
+      "name": "Zoddo",
+      "email": "zoddo.ino@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3",
+    "zoddo/gitlab-webhook": "~1.0",
+    "zoddo/php-irc": "~1.0"
+  },
+  "autoload": {
+    "psr-4": { "Zoddo\\gitlab\\irc\\": "" }
+  }
+}
