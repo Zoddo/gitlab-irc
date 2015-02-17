@@ -46,10 +46,17 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 
 		$branch = str_replace('refs/heads/', '', $data['ref']);
 		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
-		
+
 		if ($data['before'] === '0000000000000000000000000000000000000000')
 		{
 			$message .= sprintf('created %s (+%s new commits): ', $this->format('branch', $branch), $this->format('num', $data['total_commits_count']));
+			$message .= $this->format('url', sprintf('%s/commits/%s', $data['repository']['homepage'], $branch));
+		}
+		elseif ($data['total_commits_count'] == 0)
+		{
+			$before = substr($data['before'], 0, 7);
+			$after = substr($data['after'], 0, 7);
+			$message .= sprintf("\00304force-pushed\017 %s from %s to %s: ", $this->format('branch', $branch), $this->format('hash', $before), $this->format('hash', $after));
 			$message .= $this->format('url', sprintf('%s/commits/%s', $data['repository']['homepage'], $branch));
 		}
 		else
