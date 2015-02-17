@@ -12,7 +12,7 @@ $ircConfig->setPort(6697)
 		->setSsl();
 $config = new Config($ircConfig, '#Zoddo');
 
-$event = new Event($_POST);
+$event = new Event(file_get_contents("php://input"));
 $event->addEventListener(new EventListener($config));
 if ($event->gettype() !== null)
 {

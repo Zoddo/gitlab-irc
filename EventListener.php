@@ -38,12 +38,12 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 	 */
 	public function onPush(array $data)
 	{
-		if ($data['after'] == '0000000000000000000000000000000000000000')
+		if ($data['after'] === '0000000000000000000000000000000000000000')
 		{
 			$this->onDelete($data);
 			return;
 		}
-		
+
 		$branch = str_replace('refs/heads/', '', $data['ref']);
 		if ($data['total_commits_count'] == 1)
 		{
@@ -78,7 +78,7 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 	 */
 	public function onTag(array $data)
 	{
-		if ($data['after'] == '0000000000000000000000000000000000000000')
+		if ($data['after'] === '0000000000000000000000000000000000000000')
 		{
 			$this->onDelete($data);
 			return;
