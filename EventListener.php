@@ -43,8 +43,10 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 			$this->onDelete($data);
 			return;
 		}
+
 		$branch = str_replace('refs/heads/', '', $data['ref']);
 		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
+		
 		if ($data['before'] === '0000000000000000000000000000000000000000')
 		{
 			$message .= sprintf('created %s (+%s new commits): ', $this->format('branch', $branch), $this->format('num', $data['total_commits_count']));
@@ -66,8 +68,10 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 
 		$this->sendToIrc($message);
 
-		foreach ($data['commits'] as $commit)
+		foreach ($data['commits'] as &$commit)
 		{
+			$commit['message'] = trim($commit['message']);
+
 			$hash = substr($commit['id'], 0, 7);
 			$short  = substr($commit['message'], 0, strpos($commit['message'], "\n"));
 			$short .= (empty($short)) ? $commit['message'] : '...';
