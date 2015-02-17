@@ -38,6 +38,12 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 	 */
 	public function onPush(array $data)
 	{
+		if ($data['after'] == '0000000000000000000000000000000000000000')
+		{
+			$this->onDelete($data);
+			return;
+		}
+		
 		$branch = str_replace('refs/heads/', '', $data['ref']);
 		if ($data['total_commits_count'] == 1)
 		{
@@ -72,12 +78,33 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 	 */
 	public function onTag(array $data)
 	{
+		if ($data['after'] == '0000000000000000000000000000000000000000')
+		{
+			$this->onDelete($data);
+			return;
+		}
+
 		$tag = str_replace('refs/tags/', '', $data['ref']);
 		$hash = substr($data['after'], 0, 7);
 		$url = sprintf('%s/commits/%s', $data['repository']['homepage'], $tag);
 
 		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
 		$message .= sprintf('tagged %s at %s: %s', $this->format('tag', $tag), $this->format('hash', $hash), $url);
+
+		$this->sendToIrc($message);
+	}
+
+	/**
+	 * @param array $data
+	 */
+	protected function onDelete(array $data)
+	{
+		$ref = str_replace(array('refs/heads/', 'refs/tags/'), '', $data['ref']);
+		$hash = substr($data['before'], 0, 7);
+		$url = sprintf('%s/commit/%s', $data['repository']['homepage'], $data['before']);
+
+		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
+		$message .= sprintf('deleted %s at %s: %s', $this->format('tag', $ref), $this->format('hash', $hash), $url);
 
 		$this->sendToIrc($message);
 	}
