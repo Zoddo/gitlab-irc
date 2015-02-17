@@ -43,20 +43,26 @@ class EventListener implements onPushInterface, onTagInterface, onMergeInterface
 			$this->onDelete($data);
 			return;
 		}
-
 		$branch = str_replace('refs/heads/', '', $data['ref']);
-		if ($data['total_commits_count'] == 1)
+		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
+		if ($data['before'] === '0000000000000000000000000000000000000000')
 		{
-			$url = $data['commits'][0]['url'];
+			$message .= sprintf('created %s (+%s new commits): ', $this->format('branch', $branch), $this->format('num', $data['total_commits_count']));
+			$message .= $this->format('url', sprintf('%s/commits/%s', $data['repository']['homepage'], $branch));
 		}
 		else
 		{
-			$url = sprintf('%s/compare/%s...%s', $data['repository']['homepage'], $data['before'], $data['after']);
-		}
+			$message .= sprintf('pushed %s new commits to %s: ', $this->format('num', $data['total_commits_count']), $this->format('branch', $branch));
 
-		$message  = sprintf('[%s] %s ', $this->format('repo', $data['repository']['name']), $this->format('name', $data['user_name']));
-		$message .= sprintf('pushed %s new commits to %s: ', $this->format('num', $data['total_commits_count']), $this->format('branch', $branch));
-		$message .= $this->format('url', $url);
+			if ($data['total_commits_count'] == 1)
+			{
+				$message .= $this->format('url', $data['commits'][0]['url']);
+			}
+			else
+			{
+				$message .= $this->format('url', sprintf('%s/compare/%s...%s', $data['repository']['homepage'], $data['before'], $data['after']));
+			}
+		}
 
 		$this->sendToIrc($message);
 
